@@ -1,25 +1,64 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import React from 'react';
 import appConfig from '../config.json';
+import { createClient } from '@supabase/supabase-js'
+
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzYzNDc1MiwiZXhwIjoxOTU5MjEwNzUyfQ.IEpaL-UFMO5iiPO99RiJKsL791KNEA-Pq_uF9un_JP8';
+const SUPABASE_URL = 'https://piedphvnfypfukgwtume.supabase.co';
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// fetch(`${SUPABASE_URL}/rest/v1/mensagens?select=*`, {
+//     headers = {
+//         'Content-type': 'application/json',
+//         'apikey': SUPABASE_ANON_KEY,
+//         'Authorization': 'Bearer' + SUPABASE_ANON_KEY,
+//     }
+// })
+// .then((res) => {
+//     return res.json();
+// })
+// .then((response) => {
+//     console.log(response);
+// });
+
+
 
 export default function ChatPage() {
-    // Sua lógica vai aqui
     const [mensagem, setMensagem] = React.useState('');
     const [listaMsg, setListaMsg] = React.useState([]);
-
-
-    // ./Sua lógica vai aqui
+    
+    React.useEffect(() => {
+        supabaseClient
+            .from('mensagens')
+            .select('*')
+            .order('id', { ascending: false })
+            .then(({  data }) => {
+                console.log('Dados do supa:', data);
+                setListaMsg(data);
+            })
+    }, []);
 
     function handleNovaMensagem(novaMensagem) {
         const mensagem = {
-            id: listaMsg.length + 1,
+            //id: listaMsg.length + 1,
             de: 'vanessametonini',
             texto: novaMensagem,
         };
-        setListaMsg([            
-            mensagem,
-            ...listaMsg,
-        ]);
+
+        supabaseClient
+            .from('mensagens')
+            .insert([
+                //tem q ser um objeto com os mesmos campos que vc escreveu no supabase
+                mensagem
+            ])
+            .then(({ data }) => {
+                console.log('Criando mensagem:', data)
+                setListaMsg([            
+                    data[0],
+                    ...listaMsg,
+                ]);
+            });
+
         setMensagem('');
     }
     return (
@@ -177,7 +216,7 @@ function MessageList(props) {
                                     display: 'inline-block',
                                     marginRight: '8px',
                                 }}
-                                src={`https://github.com/vanessametonini.png`}
+                                src={`https://github.com/${mensagem.de}.png`}
                             />
                             <Text tag="strong">
                                 {mensagem.de}
