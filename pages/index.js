@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import appConfig from '../config.json';
 
 
-
 function Titulo(props) {
 	const Tag = props.tag || 'h1';
 	return (
@@ -70,8 +69,8 @@ export default function PaginaInicial() {
 						onSubmit={function (infosEvento) {
 							infosEvento.preventDefault();
 							console.log('Submetido');
+							roteamento.push(`/chat?username=${username}`);
 							//window.location.href = '/chat';
-							roteamento.push('/chat')
 						}}
 						styleSheet={{
 							display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
